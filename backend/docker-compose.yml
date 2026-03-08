@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: buildmyhome-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: buildmyhome
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - buildmyhome-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: buildmyhome-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - buildmyhome-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: buildmyhome-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/buildmyhome
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - buildmyhome-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  buildmyhome-network:
+    driver: bridge
+

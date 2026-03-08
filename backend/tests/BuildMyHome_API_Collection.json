@@ -1,0 +1,1062 @@
+{
+  "info": {
+    "name": "BuildMyHome API",
+    "description": "API test collection for BuildMyHome MERN backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "engineerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "designId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bookingId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/../health"
+          }
+        },
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ping"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test{{$randomInt}}@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/refresh-token",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/logout",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/auth/change-password",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/profile/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/users/profile/me",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"UpdatedName\",\n  \"phone\": \"+1234567890\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Preferences",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/preferences/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update My Preferences",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/users/preferences/me",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"budgetMin\": 1000000,\n  \"budgetMax\": 5000000,\n  \"preferredStyles\": [\"modern\", \"villa\"],\n  \"landSize\": 2000,\n  \"desiredRooms\": 4\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/bookings/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Apply as Engineer",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/users/apply-engineer",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"licenseNumber\": \"ENG123456\",\n  \"specializations\": [\"Modern\", \"Villa\"],\n  \"experience\": 5,\n  \"serviceAreas\": [\n    {\n      \"location\": \"Mumbai\",\n      \"radiusKm\": 50\n    }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Engineers",
+      "item": [
+        {
+          "name": "List Engineers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/engineers?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "engineers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Featured Engineers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/engineers/featured"
+          }
+        },
+        {
+          "name": "Search Engineers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/engineers/search?q=modern",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "engineers",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "modern"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Engineer by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/engineers/:engineerId",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Engineer Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/engineers/:engineerId/designs"
+          }
+        },
+        {
+          "name": "Get Engineer Reviews",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/engineers/:engineerId/reviews"
+          }
+        },
+        {
+          "name": "Get Engineer Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/engineers/:engineerId/stats"
+          }
+        },
+        {
+          "name": "Update Engineer Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/engineers/profile",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Experienced architect with 10+ years\",\n  \"specializations\": [\"Modern\", \"Contemporary\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Availability",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/engineers/availability",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availability\": [\n    {\n      \"dayOfWeek\": 1,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\"\n    }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Designs",
+      "item": [
+        {
+          "name": "List Designs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/designs?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "designs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Featured Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/designs/featured"
+          }
+        },
+        {
+          "name": "Get Trending Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/designs/trending"
+          }
+        },
+        {
+          "name": "Get Filter Options",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/designs/filters/options"
+          }
+        },
+        {
+          "name": "Get Design by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/designs/:designId"
+          }
+        },
+        {
+          "name": "Get Design by Slug",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/designs/slug/:slug"
+          }
+        },
+        {
+          "name": "Create Design",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/designs",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Modern Villa Design\",\n  \"description\": \"A beautiful modern villa with 3 bedrooms\",\n  \"specifications\": {\n    \"totalArea\": 2500,\n    \"landWidth\": 50,\n    \"landLength\": 60,\n    \"floors\": 2,\n    \"bedrooms\": 3,\n    \"bathrooms\": 2,\n    \"livingRooms\": 2,\n    \"kitchen\": 1,\n    \"garage\": 1,\n    \"style\": \"modern\",\n    \"constructionType\": \"RCC\",\n    \"estimatedCost\": 5000000,\n    \"estimatedDuration\": 180\n  },\n  \"location\": {\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\"\n  },\n  \"tags\": [\"modern\", \"villa\", \"luxury\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Design",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/designs/:designId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Design Title\",\n  \"description\": \"Updated description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Design",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/designs/:designId",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get My Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/designs/engineer/my-designs",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Like Design",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/designs/:designId/like",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"engineerId\": \"{{engineerId}}\",\n  \"designId\": \"{{designId}}\",\n  \"type\": \"consultation\",\n  \"scheduledDate\": \"2024-12-25\",\n  \"scheduledTime\": \"10:00\",\n  \"duration\": 60,\n  \"meetingType\": \"video\",\n  \"projectDetails\": {\n    \"landSize\": 2000,\n    \"budget\": 5000000,\n    \"requirements\": \"Looking for a modern design\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/my-bookings",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/:bookingId",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings/:bookingId/cancel",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Changed my mind\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Check Availability",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bookings/engineer/:engineerId/availability?date=2024-12-25",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bookings",
+                "engineer",
+                ":engineerId",
+                "availability"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-12-25"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reviews",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"engineerId\": \"{{engineerId}}\",\n  \"bookingId\": \"{{bookingId}}\",\n  \"rating\": 5,\n  \"title\": \"Excellent Service\",\n  \"comment\": \"The engineer was very professional and delivered exactly what we wanted.\",\n  \"pros\": [\"Professional\", \"Timely delivery\", \"Great communication\"],\n  \"cons\": [\"Nothing\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reviews?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reviews"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Engineer Reviews",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reviews/engineer/:engineerId"
+          }
+        },
+        {
+          "name": "Get Review Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reviews/stats/:engineerId"
+          }
+        },
+        {
+          "name": "Get Review by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reviews/:reviewId"
+          }
+        },
+        {
+          "name": "Get My Reviews",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reviews/my/reviews",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/reviews/:reviewId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated comment\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/reviews/:reviewId",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Mark Review Helpful",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reviews/:reviewId/helpful",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/categories"
+          }
+        },
+        {
+          "name": "Get Category Hierarchy",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/categories/hierarchy"
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/categories/:categoryId"
+          }
+        },
+        {
+          "name": "Get Category by Slug",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/categories/slug/:slug"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "Get Home Recommendations",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recommendations/home"
+          }
+        },
+        {
+          "name": "Get Trending Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recommendations/trending"
+          }
+        },
+        {
+          "name": "Get Popular Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recommendations/popular"
+          }
+        },
+        {
+          "name": "Get Design Recommendations",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recommendations/designs/:designId"
+          }
+        },
+        {
+          "name": "Get Budget Recommendations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/recommendations/budget?minCost=1000000&maxCost=5000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recommendations",
+                "budget"
+              ],
+              "query": [
+                {
+                  "key": "minCost",
+                  "value": "1000000"
+                },
+                {
+                  "key": "maxCost",
+                  "value": "5000000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Personalized Recommendations",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recommendations/personalized",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Get Chats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/chats",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Messages",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/chats/:chatId/messages",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/chats/:chatId/messages",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello!\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/notifications",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/notifications/:id/read",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/dashboard",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/users",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Designs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/designs",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Design",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/admin/designs/:designId/approve",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/uploads/image",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Upload File",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/uploads/file",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+
