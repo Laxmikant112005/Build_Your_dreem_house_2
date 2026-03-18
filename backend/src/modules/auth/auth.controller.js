@@ -129,6 +129,53 @@ const resendVerification = asyncHandler(async (req, res) => {
   ApiResponse.ok(res, 'Verification email sent');
 });
 
+const otpService = require('./otp.service');
+
+/**
+ * Send OTP
+ */
+const sendOTP = asyncHandler(async (req, res) => {
+  const { email, phone } = req.body;
+  
+  if (!email && !phone) {
+    return ApiResponse.badRequest(res, 'Email or phone is required');
+  }
+
+  const identifier = email || phone;
+  const result = await otpService.sendOTPToUser(identifier);
+  
+  ApiResponse.ok(res, 'OTP sent successfully', result);
+});
+
+/**
+ * Verify OTP
+ */
+const verifyOTP = asyncHandler(async (req, res) => {
+  const { email, phone, otp } = req.body;
+  
+  if (!otp || (!email && !phone)) {
+    return ApiResponse.badRequest(res, 'OTP, email or phone is required');
+  }
+
+  const identifier = email || phone;
+  const result = await otpService.verifyOTP(identifier, otp);
+  
+  ApiResponse.ok(res, 'OTP verified successfully', result);
+});
+
+const resendOTP = asyncHandler(async (req, res) => {
+  const { email, phone } = req.body;
+  
+  if (!email && !phone) {
+    return ApiResponse.badRequest(res, 'Email or phone is required');
+  }
+
+  const identifier = email || phone;
+  const result = await otpService.resendOTP(identifier);
+  
+  ApiResponse.ok(res, 'New OTP sent successfully', result);
+});
+
 module.exports = {
   register,
   login,
@@ -140,5 +187,10 @@ module.exports = {
   getMe,
   verifyEmail,
   resendVerification,
+  sendOTP,
+  verifyOTP,
+  resendOTP,
 };
+
+
 

@@ -104,19 +104,21 @@ class DesignService {
   /**
    * Get designs with filters and pagination
    */
-  async getDesigns(filters = {}, options = {}) {
+async getDesigns(filters = {}, options = {}) {
     const {
       page = 1,
       limit = 20,
       sortBy = 'createdAt',
       sortOrder = 'desc',
       search,
+      type,
       style,
+      facing,
+      floors,
       minCost,
       maxCost,
       minArea,
       maxArea,
-      floors,
       city,
     } = options;
 
@@ -126,21 +128,27 @@ class DesignService {
     if (search) {
       query.$text = { $search: search };
     }
+    if (type) {
+      query['specifications.type'] = type;
+    }
     if (style) {
       query['specifications.style'] = style;
     }
-    if (minCost || maxCost) {
-      query['specifications.estimatedCost'] = {};
-      if (minCost) query['specifications.estimatedCost'].$gte = minCost;
-      if (maxCost) query['specifications.estimatedCost'].$lte = maxCost;
-    }
-    if (minArea || maxArea) {
-      query['specifications.totalArea'] = {};
-      if (minArea) query['specifications.totalArea'].$gte = minArea;
-      if (maxArea) query['specifications.totalArea'].$lte = maxArea;
+    if (facing) {
+      query['specifications.facing'] = facing;
     }
     if (floors) {
       query['specifications.floors'] = floors;
+    }
+    if (minCost || maxCost) {
+      query['specifications.estimatedCost'] = {};
+      if (minCost) query['specifications.estimatedCost'].$gte = parseFloat(minCost);
+      if (maxCost) query['specifications.estimatedCost'].$lte = parseFloat(maxCost);
+    }
+    if (minArea || maxArea) {
+      query['specifications.totalArea'] = {};
+      if (minArea) query['specifications.totalArea'].$gte = parseFloat(minArea);
+      if (maxArea) query['specifications.totalArea'].$lte = parseFloat(maxArea);
     }
     if (city) {
       query['location.city'] = new RegExp(city, 'i');
@@ -332,7 +340,7 @@ class DesignService {
     }
   }
 
-  /**
+/**
    * Get filter options
    */
   async getFilterOptions() {
@@ -361,7 +369,74 @@ class DesignService {
       floors: [1, 2, 3, 4, 5],
     };
   }
+
+  /**
+   * Smart design suggestions with scoring
+   */
+  async suggestDesigns(preferences) {
+    const {
+      budget,
+      area,
+      style,
+      facing,
+      floors,
+      type,
+    } = preferences;
+
+    // Get all approved designs
+    const designs = await Design.find({ status: DESIGN_STATUS.APPROVED })
+      .populate('engineerId', 'firstName lastName avatar engineerProfile.rating')
+      .lean();
+
+    // Calculate score for each design
+    const scoredDesigns = designs.map((design) => {
+      const spec = design.specifications;
+
+      // Budget match (0-1)
+      const budgetMatch = spec.estimatedCost <= budget ? 1 : Math.max(0, 1 - (spec.estimatedCost - budget) / budget * 0.5);
+
+      // Area match (0-1)
+      const areaDiff = Math.abs(spec.totalArea - area);
+      const areaMatch = Math.max(0, 1 - areaDiff / area);
+
+      // Style match
+      const styleMatch = style && spec.style === style ? 1 : 0.5;
+
+      // Facing match
+      const facingMatch = facing && spec.facing === facing ? 1 : 0.5;
+
+      // Floors match
+      const floorsMatch = floors && spec.floors === floors ? 1 : 0.8;
+
+      // Type match (BHK)
+      const typeMatch = type && spec.type === type ? 1 : 0.5;
+
+      // Weighted score
+      const score = 
+        budgetMatch * 0.35 +
+        areaMatch * 0.25 +
+        styleMatch * 0.15 +
+        facingMatch * 0.15 +
+        floorsMatch * 0.10;
+
+      return {
+        ...design,
+        score,
+        matchTags: [
+          budgetMatch > 0.9 ? 'Budget Friendly' : '',
+          areaMatch > 0.9 ? 'Perfect Fit' : '',
+          styleMatch === 1 ? 'Style Match' : '',
+        ].filter(Boolean),
+      };
+    });
+
+    // Sort by score descending, limit to top 10
+    return scoredDesigns
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+  }
 }
 
 module.exports = new DesignService();
+
 

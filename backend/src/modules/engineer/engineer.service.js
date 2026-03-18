@@ -343,7 +343,45 @@ class EngineerService {
   /**
    * Get engineer statistics
    */
-  async getEngineerStats(engineerId) {
+async getEngineerEarnings(engineerId) {
+    // Calculate total earnings from payments
+    const totalEarnings = await Payment.aggregate([
+      {
+        $match: {
+          engineerId: require('mongoose').Types.ObjectId.createFromHexString(engineerId),
+          status: 'completed'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    // Update user profile
+    await User.findByIdAndUpdate(engineerId, {
+      $set: {
+        'engineerProfile.earnings': totalEarnings[0]?.total || 0,
+        'engineerProfile.completedProjects': await Booking.countDocuments({
+          engineerId: require('mongoose').Types.ObjectId.createFromHexString(engineerId),
+          status: 'completed'
+        })
+      }
+    });
+
+    return {
+      engineerId,
+      totalEarnings: totalEarnings[0]?.total || 0,
+      completedProjects: await Booking.countDocuments({
+        engineerId: require('mongoose').Types.ObjectId.createFromHexString(engineerId),
+        status: 'completed'
+      })
+    };
+  }
+
+async getEngineerStats(engineerId) {
     const [
       totalDesigns,
       totalBookings,
@@ -451,7 +489,70 @@ class EngineerService {
       },
     };
   }
+
+  /**
+   * Discover engineers by location, rating, price
+   */
+  async discoverEngineers({ lat, lng, minRating = 0, maxPricePerSqft = Infinity, designId }) {
+    const engineers = await User.find({
+      role: ROLE.ENGINEER,
+      isActive: true,
+      'engineerProfile.isVerified': true,
+    }).select('firstName lastName avatar phone engineerProfile location');
+
+    const scoredEngineers = engineers.map(engineer => {
+      const profile = engineer.engineerProfile;
+      
+      // Distance score (haversine formula ~km)
+      const distance = this.calculateDistance(lat, lng, engineer.location?.lat, engineer.location?.lng || 0);
+      const distanceScore = Math.max(0, 1 / (1 + distance / 10)); // Within 10km perfect
+
+      // Rating score (minRating filter)
+      if (profile.rating.average < minRating) return null;
+      const ratingScore = profile.rating.average / 5;
+
+      // Price score
+      const priceScore = profile.pricePerSqft <= maxPricePerSqft ? 1 : Math.max(0, 1 - (profile.pricePerSqft - maxPricePerSqft) / maxPricePerSqft);
+
+      // Verification bonus
+      const verifiedBonus = profile.isVerified ? 0.1 : 0;
+
+      // Experience bonus
+      const experienceScore = Math.min(1, profile.experience / 10);
+
+      // Total score
+      const score = distanceScore * 0.4 + ratingScore * 0.3 + priceScore * 0.2 + verifiedBonus + experienceScore * 0.1;
+
+      return {
+        ...engineer.toObject(),
+        score,
+        distance: Math.round(distance * 10) / 10, // km
+        tags: [
+          ratingScore > 0.8 ? 'Top Rated' : '',
+          distance < 5 ? 'Nearby' : '',
+          priceScore > 0.8 ? 'Budget Friendly' : '',
+        ].filter(Boolean),
+      };
+    }).filter(Boolean);
+
+    // Sort by score descending
+    return scoredEngineers
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+  }
+
+  calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Earth radius km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180 ) * Math.cos(lat2 * Math.PI / 180 ) * 
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
 }
 
 module.exports = new EngineerService();
+
 

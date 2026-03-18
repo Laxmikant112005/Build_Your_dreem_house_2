@@ -177,5 +177,6 @@ module.exports = {
   removePortfolioItem,
   getEngineerStats,
   searchEngineers,
+  discoverEngineers: require('./engineer.discover.controller').discoverController.discoverEngineers,
 };
 

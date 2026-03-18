@@ -17,12 +17,17 @@ const registerValidation = [
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('firstName').notEmpty().trim().isLength({ min: 1, max: 50 }).withMessage('First name is required'),
   body('lastName').notEmpty().trim().isLength({ min: 1, max: 50 }).withMessage('Last name is required'),
-  body('phone').optional().matches(/^[+]?[\d\s-]{10,}$/),
+  body('phone').optional().matches(/^[+]?[\\d\\s-]{10,}$/),
 ];
 
 const loginValidation = [
   body('email').isEmail().normalizeEmail(),
   body('password').notEmpty(),
+];
+
+const otpValidation = [
+  body('email').optional().isEmail().normalizeEmail(),
+  body('phone').optional().matches(/^[+]?[\\d\\s-]{10,}$/),
 ];
 
 const refreshTokenValidation = [
@@ -46,6 +51,8 @@ const changePasswordValidation = [
 // Public routes
 router.post('/register', registerValidation, validate, authController.register);
 router.post('/login', authLimiter, loginValidation, validate, authController.login);
+router.post('/send-otp', authLimiter, otpValidation, validate, authController.sendOTP);
+router.post('/verify-otp', authLimiter, [...otpValidation, body('otp').isLength({ min: 6, max: 6 }).isNumeric()], validate, authController.verifyOTP);
 router.post('/refresh-token', refreshTokenValidation, validate, authController.refreshToken);
 router.post('/forgot-password', authLimiter, forgotPasswordValidation, validate, authController.forgotPassword);
 router.post('/reset-password', resetPasswordValidation, validate, authController.resetPassword);
@@ -58,4 +65,3 @@ router.put('/change-password', authenticate, changePasswordValidation, validate,
 router.post('/resend-verification', authenticate, authController.resendVerification);
 
 module.exports = router;
-

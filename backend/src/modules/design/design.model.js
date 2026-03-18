@@ -34,25 +34,31 @@ const designSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
     },
-    specifications: {
-      totalArea: {
-        type: Number,
+specifications: {
+      type: {
+        type: String,
+        enum: ['1BHK', '2BHK', '3BHK', '4BHK', '5BHK+', 'Studio'],
         required: true,
-        min: 0,
       },
-      landWidth: {
-        type: Number,
-        min: 0,
+      style: {
+        type: String,
+        enum: HOUSE_STYLES,
+        required: true,
       },
-      landLength: {
-        type: Number,
-        min: 0,
+      facing: {
+        type: String,
+        enum: ['East', 'West', 'North', 'South', 'North-East', 'South-East', 'South-West', 'North-West'],
       },
       floors: {
         type: Number,
         required: true,
         min: 1,
         max: 50,
+      },
+      totalArea: {
+        type: Number,
+        required: true,
+        min: 0,
       },
       bedrooms: {
         type: Number,
@@ -79,11 +85,6 @@ const designSchema = new mongoose.Schema(
         default: 0,
         min: 0,
       },
-      style: {
-        type: String,
-        enum: HOUSE_STYLES,
-        required: true,
-      },
       constructionType: {
         type: String,
         enum: CONSTRUCTION_TYPES,
@@ -92,6 +93,7 @@ const designSchema = new mongoose.Schema(
       estimatedCost: {
         type: Number,
         min: 0,
+        required: true,
       },
       estimatedDuration: {
         type: Number, // in days

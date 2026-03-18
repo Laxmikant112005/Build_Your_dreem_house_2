@@ -11,14 +11,64 @@ const notificationService = require('../notification/notification.service');
 
 class BookingService {
   /**
-   * Create a new booking
+   * Create smart booking with availability check + transaction
    */
   async createBooking(userId, bookingData) {
-    const booking = await Booking.create({
-      ...bookingData,
-      userId,
-    });
-    return booking;
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const { engineerId, designId, date, timeSlot } = bookingData;
+      
+      // 1. Find availability
+      const availability = await Availability.findOne({
+        engineerId,
+        date: new Date(date),
+        'timeSlots': { $elemMatch: { start: timeSlot.start, end: timeSlot.end, isBooked: false } }
+      }).session(session);
+
+      if (!availability) {
+        throw new ApiError(400, 'Slot not available');
+      }
+
+      const slotIndex = availability.timeSlots.findIndex(slot => 
+        slot.start === timeSlot.start && slot.end === timeSlot.end && !slot.isBooked
+      );
+
+      if (slotIndex === -1) {
+        throw new ApiError(400, 'Slot already booked');
+      }
+
+      // 2. Mark slot as booked
+      availability.timeSlots[slotIndex].isBooked = true;
+      availability.timeSlots[slotIndex].bookingId = new mongoose.Types.ObjectId(); // temp
+      await availability.save({ session });
+
+      // 3. Create booking
+      const booking = new Booking({
+        ...bookingData,
+        userId,
+        availabilityId: availability._id,
+        timeSlot,
+        status: 'confirmed',
+      });
+
+      const savedBooking = await booking.save({ session });
+      availability.timeSlots[slotIndex].bookingId = savedBooking._id;
+      await availability.save({ session });
+
+      await session.commitTransaction();
+
+      // Send notifications
+      await notificationService.sendBookingNotification(savedBooking, 'booking_confirmed');
+
+      return savedBooking.populate(['userId', 'engineerId', 'designId']);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 
   /**

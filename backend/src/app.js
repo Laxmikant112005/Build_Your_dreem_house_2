@@ -68,6 +68,7 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+// app.use('/api/v1/ai', require('../modules/ai/ai.route'));
 app.use('/api', routes);
 
 // API documentation endpoint
@@ -86,6 +87,10 @@ app.get('/api-docs', (req, res) => {
       notifications: '/api/v1/notifications',
       uploads: '/api/v1/uploads',
       admin: '/api/v1/admin',
+      materials: '/api/v1/materials',
+      orders: '/api/v1/orders',
+      payments: '/api/v1/payments',
+      availability: '/api/v1/availability',
     },
   });
 });

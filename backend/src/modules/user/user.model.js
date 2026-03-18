@@ -128,16 +128,31 @@ const userSchema = new mongoose.Schema(
           default: 0,
         },
       },
+      earnings: {
+        type: Number,
+        default: 0,
+      },
+      completedProjects: {
+        type: Number,
+        default: 0,
+      },
     },
     refreshToken: {
       type: String,
       select: false,
     },
+
     passwordResetToken: String,
     passwordResetExpires: Date,
     emailVerificationToken: String,
     lastLoginAt: Date,
+    invalidOtpAttempts: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
   },
+
   {
     timestamps: true,
     toJSON: {
@@ -162,6 +177,7 @@ userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ isVerified: 1 });
 
 // Virtual for full name
 userSchema.virtual('fullName').get(function () {

@@ -63,6 +63,13 @@ module.exports = {
     fromName: process.env.EMAIL_FROM_NAME || 'BuildMyHome',
   },
 
+  // Razorpay
+  razorpay: {
+    keyId: process.env.RAZORPAY_KEY_ID,
+    keySecret: process.env.RAZORPAY_KEY_SECRET,
+    webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
+  },
+
   // Client URL
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
 

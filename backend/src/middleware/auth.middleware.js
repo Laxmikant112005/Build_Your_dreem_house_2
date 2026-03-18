@@ -50,11 +50,17 @@ const authenticate = async (req, res, next) => {
     // Verify token
     const { user } = await verifyToken(token);
     
+    // Check if user is verified (OTP)
+    if (!user.isVerified) {
+      throw new ApiError(401, 'Account not verified. Please verify your OTP first.');
+    }
+    
     // Add user to request object
     req.user = user;
     req.userId = user._id;
     
     next();
+
   } catch (error) {
     if (error instanceof ApiError) {
       next(error);

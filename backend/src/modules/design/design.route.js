@@ -29,5 +29,9 @@ router.get('/engineer/my-designs', authenticate, authorize('engineer'), designCo
 router.post('/:id/like', authenticate, param('id').isMongoId(), validate, designController.toggleLike);
 router.get('/:id/related', designController.getRelatedDesigns);
 
+// Suggestion routes
+const suggestionRoutes = require('./suggestion.route');
+router.use('/suggestion', suggestionRoutes);
+
 module.exports = router;
 
